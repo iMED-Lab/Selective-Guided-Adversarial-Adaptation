@@ -78,16 +78,16 @@ def param_select(param1,grad2,param3,alpha,epoch):
 
 
 args = {
-    "root":"/media/imed/personal/zjy/DA2/OCT_dataset/Topcon",
+    "root":"dataset_path",
     "img_save_path":"./save_img",
     "epoches":400,
     "lr": 5e-5,
     "lr_ed": 5e-5,
     "snapshot":100,
     "test_step":1,
-    "ckpt_path":"/media/imed/personal/zjy/DA2/Checkpoint/SGAA2_Zeiss_unet/",
+    "ckpt_path":"model_save_path",
     "batch_size":4,
-    "name":"SGAA2_Zeiss_unet",
+    "name":"model_name",
     "epoch":0
 }
 
