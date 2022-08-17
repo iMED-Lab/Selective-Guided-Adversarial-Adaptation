@@ -17,7 +17,7 @@ import logging
 import scipy.misc as misc
 import cv2
 
-# 定义网络细节结构
+
 class DoubleConv(nn.Module):
     def __init__(self,in_channels,out_channels):
         super().__init__()
@@ -66,7 +66,7 @@ class OutConv(nn.Module):
     def forward(self,x):
         return self.conv(x)
 
-# 定义网络结构
+
 class Unet(nn.Module):
     def __init__(self,in_channels,out_channels,bilinear=True):
         super().__init__()
