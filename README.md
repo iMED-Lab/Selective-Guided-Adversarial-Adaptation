@@ -15,3 +15,4 @@ Using the ```train_SGAA.py``` and ```test.py``` to train and test the model on y
 
 ## COLA: Cross-device OCT LAyer segmentation Dataset:
 The information about the COLA dataset could be seen in the following link:
+https://imed.nimte.ac.cn/cola.html
