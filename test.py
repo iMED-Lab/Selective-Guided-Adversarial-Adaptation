@@ -45,13 +45,13 @@ def random_crop(img_path,mask_path,idx):
 
 def test(modelpath):
     model = torch.load(modelpath)
-    image, label,imgname = read_datasets("/home/imed/disk5TA/zjy/DA2/OCT_dataset/Topcon","test")
+    image, label,imgname = read_datasets("dataset_path","test")
 
     net = model["model"].cuda()
 
     Dice = []
     Iou = []
-    savepath = "/home/imed/disk5TA/zjy/DA2/pred_topcon"
+    savepath = "save_path"
 
     for idx,img in enumerate(image):
         img = test_to_tensor(img).cuda()
@@ -86,7 +86,7 @@ def test(modelpath):
     print("mean_Dice:",Dice,"mean_Iou:",Iou)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '3'
-test("/home/imed/disk5TA/zjy/DA2/Checkpoint/cenet(BCE)/cenet(topcon)-BCE_epoch_39.pkl")
+test("model_path")
 
 
 
