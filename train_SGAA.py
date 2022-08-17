@@ -43,18 +43,17 @@ def param_select(param1,grad2,param3,alpha,epoch):
     if epoch <= 1:
         for ps,pt in zip(param1,param3):
             pt.data[:] = ps.data[:] 
-    # 对每一次层参数
     # count = 0
     else:
         for ps,gc,pt in zip(param1,grad2,param3):        
             ps_data,pt_data = ps.data,pt.data
             g_data = gc
 
-            # 判断是否为卷积层
+            # Determine whether convolutional layer or not
             if len(ps_data.shape) > 2:
-                # 对每一个卷积核, (梯度*参数)选择 --> EMA更新       
+                # For each convolution kernel, select (gradient*parameter) --> EMA update       
                 for i in range(ps.shape[0]):
-                    # (梯度*参数)选择
+                    # select
                     select_matrix = torch.abs(torch.mul(ps_data[i],g_data[i]))
                     select_matrix1 = torch.where(select_matrix > 0.001*torch.max(select_matrix),1.0,0.0)
                     # print(torch.sum(select_matrix1))
@@ -65,10 +64,10 @@ def param_select(param1,grad2,param3,alpha,epoch):
                     # if count == 0 and i == 0:
                     #     print("select_matrix",select_matrix)
                     #     print("pn",pn)
-                    # EMA更新
+                    # EMA update
                     pt_data[i].mul_(select_matrix2)
                     pt_data[i].add_(pn)
-            # 对BN层更新
+            # update BN
             else:
                 pt_data.mul_(alpha)
                 pt_data.add_(ps.data * (1-alpha))
@@ -94,32 +93,32 @@ args = {
 
 class Trainers:
     def __init__(self):
-        # 加载数据
+        # load data
         data_loader = Choroid_loader(root_path=args["root"],datasets="CHOROID")
         self.train_loader = data_loader.load_train_data(batch_size=args["batch_size"])
         self.test_loader = data_loader.load_test_data(batch_size=4)
         # self.pred_loader = dataloader.load_pred_data()
 
-    # 保存模型
+    # save model
     def save_ckpt(self,encoder_s,encoder_t,decoder,epoch):
         if not os.path.exists(args["ckpt_path"]):
             os.makedirs(args["ckpt_path"])
-        # 模型和评价都保存
+        # save model and evaluation
         state = {"encoder_s":encoder_s,"encoder_t":encoder_t,"decoder":decoder}
         torch.save(state,args["ckpt_path"] + args["name"] + "_epoch_" + str(epoch) + ".pkl")
         print("---> save model:{} <---".format(args["ckpt_path"]))
 
-    # 调整学习率
+    # Adjustment of learning rate
     def adjust_lr(self,optimizer,base_lr,iter,max_iter,power=0.9):
         lr = base_lr * (1 - float(iter) / max_iter) ** power
         for param_group in optimizer.param_groups:
             param_group["lr"] = lr 
 
-    # 模型评价
+    # Evaluation
     def model_eval(self,encoder,decoder):
         print("Start testing model...")
 
-        # 进行评价
+        
         encoder.eval()
         decoder.eval()
         iou,dice = [],[]
@@ -133,7 +132,7 @@ class Trainers:
             pred = decoder(x1,x2,x3,x4,x5)
 
             file_num += 1 
-            # (8,512,512) -> (1,512,512) 获得one-hot向量的索引
+            # (8,512,512) -> (1,512,512) one-hot vector
             pred = torch.topk(pred, 1, dim=1)[1]
             # print(np.sum(pred.detach().cpu().numpy()))
             # label = label 
@@ -171,21 +170,21 @@ class Trainers:
 
 
     def train(self):
-        # 网络
+        # net
         encoder_s = Encoder(3).cuda()
         encoder_c = Encoder(3).cuda()
         encoder_t = Encoder(3).cuda()
         decoder = Decoder(10).cuda()
         E_discriminator = Encoder_Discriminator(14).cuda()
         D_discriminator = Discriminator(10).cuda()
-        # 优化器
+        # optimizer
         optimizer_en_s = optim.Adam(encoder_s.parameters(),lr=args["lr"],weight_decay=5e-4)
         optimizer_en_t = optim.Adam(encoder_t.parameters(),lr=args["lr_ed"],weight_decay=5e-4)
         optimizer_en_c = optim.Adam(encoder_c.parameters(),lr=args["lr_ed"],weight_decay=5e-4)
         optimizer_de = optim.Adam(decoder.parameters(),lr=args["lr"],weight_decay=5e-4)
         optimizer_ED = optim.Adam(E_discriminator.parameters(),lr=args["lr"],weight_decay=5e-4)
         optimizer_DD = optim.Adam(D_discriminator.parameters(),lr=args["lr"],weight_decay=5e-4)
-        # 损失函数
+        # loss function
         # critrion1 = nn.MSELoss().cuda()
         seg_loss = nn.CrossEntropyLoss().cuda()
         E_loss = nn.BCELoss().cuda()
@@ -214,20 +213,20 @@ class Trainers:
             E_discriminator.train()
             D_discriminator.train()
 
-            # 参数选择传递
+           
             if epoch >= args["epoch"]+1:
                 param_s = list(encoder_s.parameters())
                 param_t = list(encoder_t.parameters())
                 param_select(param_s,grad_c,param_t,0.88,epoch)
             
             if epoch >= args["epoch"]:
-                # 参数拷贝
+                
                 param_s = list(encoder_s.parameters())
                 param_c = list(encoder_c.parameters())
                 for ps,pc in zip(param_s,param_c):
                     pc.data[:] = ps.data[:]
 
-                # 构建梯度空矩阵
+                
                 grad_c = []
                 for i in range(len(param_c)):
                     grad_c_layer = torch.zeros_like(param_c[i])
@@ -257,7 +256,7 @@ class Trainers:
                 vis.plot(name="seg_loss",y=loss_seg.item(),opts=dict(title="seg_loss",xlabel="batch",ylabel="loss"))
 
                 # if (epoch+1) >= 20 and iters % 2 == 1:
-                # 参数选择传递(编码对抗)
+                
                 
                 # print(param_s[0].data)
                 # print(param_s[0].grad.data[0].shape)
@@ -288,7 +287,7 @@ class Trainers:
                         g_c = g_c + gs_c
                                     
                     # if (epoch+1) >= 20 and iters % 2 == 1:    
-                    # 解码对抗                
+                                  
                     optimizer_DD.zero_grad()
                     s1,s2,s3,s4,s5 = encoder_s(image_s)
                     decoder_s = decoder(s1,s2,s3,s4,s5)
@@ -345,7 +344,7 @@ class Trainers:
                     dice = test_dice
 
 if __name__ == "__main__":
-    # 定义一个可视化变量
+    
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     vis = Visualizer(env=args["name"],port = 1996)
     trainer = Trainers()
