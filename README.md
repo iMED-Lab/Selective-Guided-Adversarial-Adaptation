@@ -12,3 +12,6 @@ The yellow and the green arrows indicate the source and target domain paths, res
 
 ## Get Started
 Using the ```train_SGAA.py``` and ```test.py``` to train and test the model on your own dataset,respectively.
+
+## COLA: Cross-device OCT LAyer segmentation Dataset:
+The information about the ROSE dataset could be seen in the following link:
