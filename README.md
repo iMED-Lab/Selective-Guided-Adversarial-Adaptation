@@ -2,7 +2,7 @@
 Selective Guided Adversarial Adaptation for Cross-device OCT Images Segmentation
 
 ## Overview
-<img src="https://github.com/iMED-Lab/Selective-Guided-Adversarial-Adaptation/blob/main/Fig.3.png" width="800" height="350"><br/>
+<img src="https://github.com/iMED-Lab/Selective-Guided-Adversarial-Adaptation/blob/main/figures/Fig.3.png" width="800" height="350"><br/>
 The yellow and the green arrows indicate the source and target domain paths, respectively. The black dashed arrows denote the selective parameter guidance, and the red dashed arrows represent the adversarial learning.
 
 ## Requirements
