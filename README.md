@@ -11,4 +11,4 @@ The yellow and the green arrows indicate the source and target domain paths, res
 ![image](https://img.shields.io/badge/visdom-%3E%3D0.2.0-blue)
 
 ## Get Started
-Using the ```train.py``` and ```test.py``` to train and test the model on your own dataset, respectively.
+Using the ```train.py``` to train the model on your own dataset.
